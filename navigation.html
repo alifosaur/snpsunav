@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SNPSU Campus Navigator</title>
+  <link rel="stylesheet" href="navigation.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">SNPSU Navigator</div>
+    <div class="nav-controls">
+      <a href="home1.html" class="back-btn">Home</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Smart Campus Navigation</h1>
+    <p>Find your way • Turn-by-turn directions</p>
+  </section>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- Step 1: Get Location -->
+    <div class="card">
+      <div class="card-header">
+        <h2>📍 Step 1: Get Your Location</h2>
+      </div>
+      <div class="card-body">
+        <button id="get-location-btn" class="btn-primary">
+          <span class="btn-icon"></span>
+          <span>Get My Current Location</span>
+        </button>
+        <div id="location-status" class="status-message"></div>
+      </div>
+    </div>
+
+    <!-- Step 2: Select Destination -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Step 2: Select Block & Floor</h2>
+      </div>
+      <div class="card-body">
+        <div class="input-group">
+          <label>Select Block:</label>
+          <select id="block-select" class="input-select">
+            <option value="">-- Choose Block --</option>
+            <option value="a">A Block (Main Dome Building)</option>
+            <option value="b">B Block</option>
+            <option value="c">C Block</option>
+          </select>
+        </div>
+
+        <div id="floor-selector" class="input-group" style="display:none;">
+          <label>Select Floor:</label>
+          <select id="floor-select" class="input-select">
+            <option value="0">Ground Floor</option>
+            <option value="1">1st Floor</option>
+            <option value="2">2nd Floor</option>
+            <option value="3">3rd Floor</option>
+            <option value="4">4th Floor</option>
+            <option value="5">5th Floor</option>
+            <option value="6">6th Floor</option>
+            <option value="7">7th Floor</option>
+            <option value="8">8th Floor</option>
+            <option value="9">9th Floor</option>
+            <option value="10">10th Floor</option>
+            <option value="11">11th Floor</option>
+            <option value="12">12th Floor</option>
+          </select>
+        </div>
+
+        <div id="room-selector" class="input-group" style="display:none;">
+          <label>Select Destination Room:</label>
+          <select id="room-select" class="input-select">
+            <option value="">-- Choose Room --</option>
+          </select>
+        </div>
+
+        <button id="navigate-btn" class="btn-secondary" style="display:none;">
+          <span class="btn-icon"></span>
+          <span>Start Navigation</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Campus Map Display -->
+    <div id="campus-map-card" class="card" style="display:none;">
+      <div class="card-header">
+        <h2>Campus Overview Map</h2>
+      </div>
+      <div class="card-body">
+        <div class="map-container">
+          <!-- CAMPUS MAP - Save your first image as "campus-map.jpg" in same folder -->
+          <img id="campus-map-img" src="campus.jpeg" alt="Campus Map" class="campus-map-img">
+          <div class="map-overlay">
+            <div class="selected-block-marker" id="block-marker"></div>
+          </div>
+        </div>
+        <p class="map-caption">📍 Your selected block is highlighted</p>
+      </div>
+    </div>
+
+    <!-- Floor Plan Display -->
+    <div id="floor-map-card" class="card" style="display:none;">
+      <div class="card-header">
+        <h2><span id="floor-title">Floor Plan</span></h2>
+      </div>
+      <div class="card-body">
+        <div class="map-container">
+          <!-- FLOOR PLAN - Save your second image as "floor-plan.jpg" in same folder -->
+          <img id="floor-map-img" src="floor.jpeg" alt="Floor Plan" class="floor-map-img">
+          <div class="map-overlay">
+            <div class="selected-room-marker" id="room-marker"></div>
+          </div>
+        </div>
+        <p class="map-caption">📍 Your destination room is highlighted</p>
+      </div>
+    </div>
+
+    <!-- Turn-by-Turn Navigation -->
+    <div id="navigation-card" class="card" style="display:none;">
+      <div class="card-header">
+        <h2>Turn-by-Turn Directions</h2>
+      </div>
+      <div class="card-body">
+        
+        <!-- Voice Status Indicator -->
+        <div id="voice-status" class="voice-status">
+          Voice guidance is active
+        </div>
+
+        <!-- Live Distance Display -->
+        <div class="live-distance-panel">
+          <div class="distance-main">
+            <div class="distance-value" id="live-distance">--</div>
+            <div class="distance-label">meters remaining</div>
+          </div>
+          <div class="time-estimate">
+            <div class="time-icon">⏱️</div>
+            <div class="time-value" id="live-time">-- min</div>
+          </div>
+        </div>
+
+        <!-- Current Instruction Banner -->
+        <div class="current-instruction">
+          <div class="instruction-icon" id="current-icon">🧭</div>
+          <div class="instruction-content">
+            <div class="instruction-text" id="current-instruction-text">
+              Starting navigation...
+            </div>
+            <div class="instruction-distance" id="current-distance">
+              Calculating...
+            </div>
+          </div>
+        </div>
+
+        <!-- All Turn Instructions -->
+        <div class="turn-instructions-list">
+          <h3>Complete Route</h3>
+          <div id="turn-steps"></div>
+        </div>
+
+        <button id="stop-nav-btn" class="btn-danger">
+          <span class="btn-icon"></span>
+          <span>Stop Navigation</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 Sapthagiri NPS University • Made with ❤️ for Campus Navigation</p>
+  </footer>
+
+  <script src="navigation.js"></script>
+</body>
+</html>

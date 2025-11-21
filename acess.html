@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Navigator | SNPSU</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="acess.css">
+</head>
+<body>
+  
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <span class="logo-text">SNPSU Navigator</span>
+      </div>
+      <div class="nav-actions">
+        <button id="voice-toggle-btn" class="voice-toggle">
+          <span class="voice-icon">🔊</span>
+          <span class="voice-label">Voice ON</span>
+        </button>
+        <a href="index.html" class="btn-back">← Home</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <section class="hero-banner">
+    <div class="hero-content">
+      <h1 class="hero-title">🗺️ Campus Navigation</h1>
+      <p class="hero-subtitle">Turn-by-turn directions with live GPS tracking</p>
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- Step 1: Location -->
+    <div class="nav-card">
+      <div class="card-header">
+        <div class="step-badge">Step 1</div>
+        <h2 class="card-title">📍 Get Your Location</h2>
+      </div>
+      <div class="card-body">
+        <button id="get-location-btn" class="btn-primary btn-large">
+          <span class="btn-icon">🎯</span>
+          <span>Enable GPS Location</span>
+        </button>
+        <div id="location-status" class="status-message"></div>
+      </div>
+    </div>
+
+    <!-- Step 2: Destination Selection -->
+    <div class="nav-card">
+      <div class="card-header">
+        <div class="step-badge">Step 2</div>
+        <h2 class="card-title">🏢 Choose Destination</h2>
+      </div>
+      <div class="card-body">
+        
+        <div class="input-group">
+          <label class="input-label">Select Block:</label>
+          <select id="block-select" class="input-select">
+            <option value="">-- Choose Building Block --</option>
+            <option value="a">🏛️ A Block (Main Dome Building)</option>
+            <option value="b">🏢 B Block</option>
+            <option value="c">🏢 C Block</option>
+          </select>
+        </div>
+
+        <div id="floor-selector" class="input-group" style="display:none;">
+          <label class="input-label">Select Floor:</label>
+          <select id="floor-select" class="input-select">
+            <option value="0">Ground Floor</option>
+            <option value="1">1st Floor</option>
+            <option value="2">2nd Floor</option>
+            <option value="3">3rd Floor</option>
+            <option value="4">4th Floor</option>
+            <option value="5">5th Floor</option>
+            <option value="6">6th Floor</option>
+            <option value="7">7th Floor</option>
+            <option value="8">8th Floor</option>
+            <option value="9">9th Floor</option>
+            <option value="10">10th Floor</option>
+            <option value="11">11th Floor</option>
+            <option value="12">12th Floor</option>
+          </select>
+        </div>
+
+        <div id="room-selector" class="input-group" style="display:none;">
+          <label class="input-label">Select Room:</label>
+          <select id="room-select" class="input-select">
+            <option value="">-- Choose Destination Room --</option>
+          </select>
+        </div>
+
+        <button id="navigate-btn" class="btn-primary btn-large" style="display:none;">
+          <span class="btn-icon">🧭</span>
+          <span>Start Navigation</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Campus Map Display -->
+    <div id="campus-map-card" class="nav-card" style="display:none;">
+      <div class="card-header">
+        <h2 class="card-title">🗺️ Campus Map</h2>
+      </div>
+      <div class="card-body">
+        <div class="map-container">
+          <img src="campus-map.jpg" alt="Campus Map" class="map-image">
+          <div class="map-overlay">
+            <div class="location-marker" id="block-marker"></div>
+          </div>
+        </div>
+        <p class="map-caption">📍 Selected block highlighted on campus map</p>
+      </div>
+    </div>
+
+    <!-- Floor Plan Display -->
+    <div id="floor-map-card" class="nav-card" style="display:none;">
+      <div class="card-header">
+        <h2 class="card-title" id="floor-title">🏢 Floor Plan</h2>
+      </div>
+      <div class="card-body">
+        <div class="map-container">
+          <img src="floor-plan.jpg" alt="Floor Plan" class="map-image">
+          <div class="map-overlay">
+            <div class="location-marker" id="room-marker"></div>
+          </div>
+        </div>
+        <p class="map-caption">📍 Your destination room highlighted</p>
+      </div>
+    </div>
+
+    <!-- Live Navigation -->
+    <div id="navigation-card" class="nav-card" style="display:none;">
+      <div class="card-header">
+        <h2 class="card-title">🧭 Live Navigation</h2>
+      </div>
+      <div class="card-body">
+        
+        <!-- Voice Status -->
+        <div id="voice-status" class="voice-status">
+          🔊 Voice guidance active
+        </div>
+
+        <!-- Distance Display -->
+        <div class="distance-panel">
+          <div class="distance-main">
+            <div class="distance-value" id="live-distance">--</div>
+            <div class="distance-unit">meters</div>
+          </div>
+          <div class="distance-time">
+            <span class="time-icon">⏱️</span>
+            <span class="time-value" id="live-time">-- min</span>
+          </div>
+        </div>
+
+        <!-- Current Instruction -->
+        <div class="instruction-banner">
+          <div class="instruction-icon" id="current-icon">🧭</div>
+          <div class="instruction-content">
+            <div class="instruction-text" id="current-instruction-text">
+              Starting navigation...
+            </div>
+            <div class="instruction-distance" id="current-distance">
+              Calculating route...
+            </div>
+          </div>
+        </div>
+
+        <!-- Turn-by-Turn Steps -->
+        <div class="turn-list">
+          <h3 class="turn-list-title">📋 Complete Route</h3>
+          <div id="turn-steps" class="turn-steps"></div>
+        </div>
+
+        <!-- Stop Button -->
+        <button id="stop-nav-btn" class="btn-danger btn-large">
+          <span class="btn-icon">⏹️</span>
+          <span>Stop Navigation</span>
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 Sapthagiri NPS University • Built with ❤️ for Campus Innovation</p>
+  </footer>
+
+  <script src="acess.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login with Phone</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right,#e1bf8e); /* Bluish green gradient */
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center h-screen px-4">
+
+<a
+  href="home.html"
+  class="fixed top-3 left-3 text-[#001962] font-semibold hover:underline py-2 px-4"
+  aria-label="back"
+>
+  &#8592; Back
+</a>
+  <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+    <h2 class="text-2xl font-bold mb-6 text-[#001962] text-center">LOGIN PAGE</h2>
+    
+    <!-- Phone Number Input -->
+    <label class="block mb-2 text-sm text-gray-700 font-semibold">PHONE NUMBER</label>
+    <input
+      type="tel"
+      placeholder="Enter your phone number"
+      class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064e3b]"
+    />
+
+    <!-- OTP Input -->
+    <label class="block mt-4 mb-2 text-sm text-gray-700 font-semibold">PASSWORD</label>
+    <input
+      type="text"
+      placeholder="Enter Password"
+      class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064e3b]"
+    />
+
+    <!-- Login Button -->
+    <button class="w-full mt-6 bg-[#001962] text-white py-3 rounded-xl hover:bg-[#001962] transition">
+      Continue
+    </button>
+
+    <!-- Don't have an account -->
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Don’t have an account?
+      <a href="page.html" class="text-[#001962] font-semibold hover:underline">Create now</a>
+    </p>
+  </div>
+</body>
+</html>

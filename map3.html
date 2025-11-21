@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Map</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .map-container {
+    width: 90vw;   /* fit almost full width */
+    height: 80vh;  /* fit height nicely */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;  /* optional border around map */
+  }
+
+  .map-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* keeps aspect ratio, no zoom */
+  }
+</style>
+</head>
+<body>
+
+  <div class="map-container">
+    <img src="map3.jpeg" alt="Campus Map">
+  </div>
+
+</body>
+</html>

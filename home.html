@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    
+    :root {
+      --royal-blue: #001962;
+      --gold: #C69E66;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #001962 0%, #C69E66 100%);
+    }
+    .main-container {
+      background-color: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+    .login-button {
+      background-color: var(--royal-blue);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 2px solid var(--gold);
+      gap: 16px !important;
+    }
+    .login-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+      background-color: var(--gold);
+      color: var(--royal-blue) !important;
+    }
+    /* Make login button icons pure white and margin-right */
+    .login-button img {
+      filter: brightness(0) invert(1);
+      margin-right: 18px;
+      margin-left: 0;
+      transition: filter 0.2s;
+    }
+    .fab {
+      background: linear-gradient(45deg, var(--gold), var(--royal-blue));
+      transition: all 0.3s ease;
+      border: 2.5px solid var(--royal-blue);
+    }
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(198,158,102,0.13);
+      border-color: var(--gold);
+    }
+    .fab img {
+      filter: brightness(0) invert(1);
+    }
+    h1 {
+      color: var(--gold);
+      /* No text-shadow or gold effect */
+      text-shadow: none;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+  <div class="main-container w-full max-w-md p-8 md:p-12 text-center">
+    <h1 class="text-3xl md:text-4xl font-bold mb-10">
+      Welcome To Virtual SNPSU
+    </h1>
+    <div class="space-y-6">
+      <!-- Login as student Button -->
+      <a href="log.html" class="login-button flex items-center justify-center w-full p-4 rounded-2xl text-white text-lg font-semibold">
+        <img width="38" height="38" src="https://img.icons8.com/ios-filled/50/FFFFFF/student-male--v1.png" alt="student" />
+        Login As Student
+      </a>
+      <!-- Login as faculty Button -->
+      <a href="log.html" class="login-button flex items-center justify-center w-full p-4 rounded-2xl text-white text-lg font-semibold">
+        <img width="38" height="38" src="https://img.icons8.com/ios-filled/50/FFFFFF/teacher.png" alt="teacher"/>
+        Login As Faculty
+      </a>
+    </div>
+  </div>
+  <a
+  href="index.html"
+  class="fixed top-3 left-3 text-white font-semibold hover:underline py-2 px-4"
+  aria-label="back"
+>
+  &#8592; Back
+</a>
+
+
+  <!-- Floating Action Button for Support -->
+  <a href="main.html" class="fab fixed bottom-6 right-6 w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg">
+    <img src="https://img.icons8.com/ios-filled/50/FFFFFF/customer-support.png" alt="Support" class="w-9 h-9">
+  </a>
+
+</body>
+</html>

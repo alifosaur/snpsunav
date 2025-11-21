@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sapthagiri NPS University - Campus Navigation Assistant</title>
+  <link rel="stylesheet" href="home1.css" />
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      Sapthagiri NPS University
+    </div>
+    <a href="disa.html"><button class="cta">Accessibility</button></a>
+  </header>
+
+  <!-- FIXED HERO SECTION -->
+  <section id="home" class="hero" style="position:relative; overflow:hidden; height:350px;">
+
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline
+      style="
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        z-index:1;
+      ">
+      <source src="yourvideo.mp4" type="video/mp4">
+    </video>
+
+    <!-- Dark Overlay -->
+    <div style="
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.45);
+      z-index:2;
+    "></div>
+
+    <!-- Text -->
+    <div style="position:relative; z-index:3; text-align:center; margin-top:100px; color:white;">
+      <h1>Campus Navigation Assistant</h1>
+      <p>Your smart guide for indoor & outdoor campus navigation.</p>
+      <a href="navigation.html"><button class="cta">Open Navigation</button></a>
+    </div>
+
+  </section>
+
+  <section id="features" class="features">
+    <h2>Features</h2>
+    <div class="cards">
+      <a href="mapp.html" class="card">Interactive Campus Map</a>
+      <div class="card classroom-trigger" style="cursor:pointer;">Locate Classrooms & Labs</div>
+      <a href="accessible.html" class="card">Accessible Routes</a>
+      <a href="faculty.html" class="card">Faculty & Office Info</a>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" style="
+      display:none;
+      position: fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background: rgba(0,0,0,0.5);
+      align-items:center;
+      justify-content:center;
+      z-index:1000;
+    ">
+      <div class="modal-content" style="
+        background:white;
+        padding:20px;
+        border-radius:12px;
+        min-width:250px;
+        text-align:center;
+        box-shadow:0 4px 20px rgba(0,0,0,0.3);
+      ">
+        <h3 style="margin-bottom:12px;">Select a Block</h3>
+        <a href="map1.html" style="display:block; margin:8px 0; padding:8px; background:#eee; border-radius:8px; text-decoration:none; color:#001962;">Block A</a>
+        <a href="map2.html" style="display:block; margin:8px 0; padding:8px; background:#eee; border-radius:8px; text-decoration:none; color:#001962;">Block B</a>
+        <a href="map3.html" style="display:block; margin:8px 0; padding:8px; background:#eee; border-radius:8px; text-decoration:none; color:#001962;">Block C</a>
+        <button class="modal-close" style="margin-top:12px; padding:8px 12px; cursor:pointer;">Close</button>
+      </div>
+    </div>
+
+    <script>
+      const trigger = document.querySelector('.classroom-trigger');
+      const modal = document.querySelector('.modal');
+      const closeBtn = document.querySelector('.modal-close');
+
+      trigger.addEventListener('click', () => {
+        modal.style.display = 'flex';
+      });
+
+      closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    </script>
+
+  </section>
+
+  <footer class="footer">
+    © 2025 Sapthagiri NPS University
+  </footer>
+
+</body>
+</html>

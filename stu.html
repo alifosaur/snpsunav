@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Assist — Responder</title>
+<style>
+  :root{--navy:#001962;--gold:#C69E66;--bg:#f6f5f2}
+  *{box-sizing:border-box}
+  body{
+  font-family:Inter,system-ui,Arial;
+  margin:0;
+  background:linear-gradient(180deg,#d7bc95);
+  color:var(--navy);
+  min-height:100vh;
+  display:flex;
+  align-items:center;    /* centered vertically */
+  justify-content:center; /* centered horizontally */
+  padding:26px;
+}
+  .wrap{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr 380px;gap:18px}
+  .card{background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.08);padding:18px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--navy),#003a9e);color:#fff;display:grid;place-items:center;font-weight:800}
+  h1{margin:0;font-size:18px}
+  p.sub{margin:6px 0 12px;color:#314a63;font-size:13px}
+  label{display:block;font-weight:700;margin-top:8px}
+  input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e6edf5;font-size:14px;outline:none}
+  select,input:focus,select:focus{box-shadow:0 6px 18px rgba(0,25,80,0.06);border-color:var(--navy)}
+  .filters{display:flex;gap:8px;margin-top:8px}
+  .reqs{margin-top:12px;display:grid;gap:10px;max-height:60vh;overflow:auto;padding-right:6px}
+  .req{display:flex;justify-content:space-between;gap:10px;padding:10px;border-radius:10px;border:1px solid #eef3fb;align-items:center}
+  .meta{font-weight:700}
+  .tiny{font-size:12px;color:#6b7b8b}
+  .btn{padding:8px 10px;border-radius:10px;border:0;cursor:pointer;font-weight:700}
+  .btn-accept{background:var(--navy);color:#fff}
+  .btn-accept:hover{background:var(--gold);color:var(--navy)}
+  .presence{display:flex;gap:8px;align-items:center}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--gold)}
+  .map{height:180px;border-radius:10px;background:linear-gradient(180deg,#eef5ff,#ffffff);display:grid;place-items:center;color:var(--navy)}
+  .small{font-size:13px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card" aria-labelledby="title">
+      <header><div class="logo">ST</div><div><h1 id="title">Responder Dashboard</h1><p class="sub">See incoming assistance requests and accept them. Open the Requester page to test.</p></div></header>
+
+      <label for="name">Your name</label>
+      <input id="name" placeholder="e.g. Ali" />
+
+      <label for="studentId">Student SRN</label>
+      <input id="studentId" placeholder="e.g. 25SUUBEXXXXXX" />
+
+      <div class="filters">
+        <select id="filterBlock"><option>All</option><option>A BLOCK</option><option>B BLOCK</option><option>C BLOCK</option><option>VTU BLOCK</option><option>LIBRARY</option><option>CANTEEN</option></select>
+        <button id="setAvail" class="btn">Set Available</button>
+      </div>
+
+      <div class="reqs" id="reqs"></div>
+    </section>
+
+    <aside class="card">
+      <h3 style="margin:0 0 8px">Map & Quick</h3>
+      <div class="map" id="map">Map preview</div>
+      <div style="margin-top:12px">
+        <div class="presence"><div class="dot" id="presenceDot"></div><div class="small" id="presenceText">Not available</div></div>
+        <!-- <div style="margin-top:10px;font-size:13px;color:#6b7b8b">Tip: To test, open <strong>disabled_user.html</strong>, send a request, then accept it here.</div> -->
+      </div>
+    </aside>
+  </div>
+
+<script>
+(function(){
+  const bc = new BroadcastChannel('pickup-channel');
+  const STORAGE_KEY = 'accessible_requests_v1';
+  const nameEl = document.getElementById('name');
+  const idEl = document.getElementById('studentId');
+  const reqsEl = document.getElementById('reqs');
+  const filterEl = document.getElementById('filterBlock');
+  const setAvailBtn = document.getElementById('setAvail');
+  const presenceDot = document.getElementById('presenceDot');
+  const presenceText = document.getElementById('presenceText');
+
+  let available=false;
+
+  // helpers
+  function readAll(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return[]} }
+  function writeAll(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+  // render list
+  function render(){
+    const all = readAll();
+    const filter = filterEl.value;
+    const visible = all.filter(r=> r.status==='open' && (filter==='All' || filter==='All' || filter===r.block || filterEl.value==='All' || filterEl.value==='All') );
+    // above allows 'All' or chosen block — simpler: check explicitly
+    const filtered = (filter==='All') ? all.filter(r=>r.status==='open') : all.filter(r=> r.status==='open' && r.block===filter);
+    reqsEl.innerHTML = '';
+    if(filtered.length===0){ reqsEl.innerHTML = '<div class="tiny">No open requests</div>'; return; }
+    filtered.forEach(r=>{
+      const el = document.createElement('div'); el.className='req';
+      const left = document.createElement('div'); left.innerHTML = `<div class="meta">${r.accountId} • ${r.block} • Floor ${r.floor}</div><div class="tiny">${r.room} • ${new Date(r.createdAt).toLocaleTimeString()}</div>`;
+      const right = document.createElement('div');
+      const acceptBtn = document.createElement('button'); acceptBtn.className='btn btn-accept'; acceptBtn.textContent='Accept';
+      acceptBtn.onclick = ()=> acceptRequest(r);
+      right.appendChild(acceptBtn);
+      el.appendChild(left); el.appendChild(right);
+      reqsEl.appendChild(el);
+    });
+  }
+
+  // accept flow
+  function acceptRequest(req){
+    const name = (nameEl.value||'').trim();
+    const sid = (idEl.value||'').trim();
+    if(!name || !sid){ alert('Enter your name & student ID before accepting'); return; }
+    // double-check request is still open
+    const arr = readAll();
+    const obj = arr.find(x=>x.id===req.id);
+    if(!obj){ alert('Request not found (refresh)'); render(); return; }
+    if(obj.status!=='open'){ alert('Request already accepted'); render(); return; }
+    // mark accepted
+    obj.status='accepted';
+    obj.acceptedBy = sid;
+    obj.acceptedName = name;
+    obj.acceptedAt = Date.now();
+    // compute ETA simple (random 2-8 minutes)
+    const etaMins = Math.max(2, Math.round(Math.random()*8));
+    obj.eta = etaMins+' min';
+    writeAll(arr);
+    bc.postMessage({type:'accept-request', payload:{id:obj.id, acceptedBy:sid, acceptedName:name, eta: obj.eta, accountId: obj.accountId}});
+    alert('Accepted — ETA: '+obj.eta);
+    render();
+  }
+
+  // listen to broadcast (new/updated requests)
+  bc.onmessage = e=>{
+    const {type,payload} = e.data||{};
+    if(type==='new-request' || type==='update-requests' || type==='accept-request'){
+      // refresh local copy from localStorage
+      render();
+    }
+  };
+
+  // also refresh on storage changes
+  window.addEventListener('storage', ()=> render());
+
+  // create fake sample requests button (for quick demo)
+  // set availability toggle
+  setAvailBtn.addEventListener('click', ()=>{
+    available = !available;
+    presenceDot.style.background = available ? '#10b981' : 'var(--gold)';
+    presenceText.textContent = available ? 'Available to help' : 'Not available';
+    setAvailBtn.textContent = available ? 'Set Not Available' : 'Set Available';
+  });
+
+  // initial render
+  render();
+
+  // convenience: auto-refresh every 2s to pick up local changes across browsers that don't use BroadcastChannel
+  setInterval(render, 2000);
+
+})();
+</script>
+</body>
+</html>

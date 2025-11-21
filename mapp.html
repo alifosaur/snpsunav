@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rotated Map</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .map-container {
+      width: 100vh;      /* Use height as width after rotation */
+      height: 100vw;     /* Use width as height after rotation */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: rotate(-90deg);  /* Rotate whole container LEFT */
+    }
+
+    .map-container img {
+      width: auto;
+      height: 100%;
+      object-fit: contain;
+    }
+  </style>
+
+</head>
+<body>
+
+  <div class="map-container">
+    <img src="map.jpeg" alt="Rotated Map">
+  </div>
+
+</body>
+</html>

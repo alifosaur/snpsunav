@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus 360° Explorer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css">
+  <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
+
+  <style>
+    :root {
+      --royal-blue: #001962;
+      --gold: #c69e66;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f5f5;
+      
+    }
+    .header {
+      background: linear-gradient(90deg, #001962, #0b2a8f,#c69e66,#001962);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(198, 158, 102, 0.2);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+    .location-grid-item img {
+      width: 100%;
+      height: 14rem;
+      object-fit: cover;
+    }
+    .viewer-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+    }
+    .viewer-modal.active {
+      display: flex;
+    }
+    #panorama {
+      width: 100%;
+      height: 100%;
+    }
+    .viewer-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+    }
+    .btn-primary {
+      background-color: var(--royal-blue);
+      color: var(--gold);
+      border: 2px solid var(--gold);
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .viewer-info {
+      position: absolute;
+      bottom: 0;
+      padding: 20px;
+      color: white;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header text-white py-4 px-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Campus 360° Explorer</h1>
+      <span id="locationCount" class="font-medium">0 Locations</span>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-8">
+
+    <div class="card p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-2" style="color: var(--royal-blue);">Welcome to Virtual Campus Tour</h2>
+      <p class="text-gray-600">Explore our campus in 360° views. Click a location to begin.</p>
+    </div>
+
+    <div class="card p-4 mb-6">
+      <label class="font-semibold" style="color: var(--royal-blue);">Filter by Location:</label>
+      <select id="filterLocation" class="px-4 py-2 border-2 rounded-lg" onchange="filterLocations()" style="border-color: var(--gold);">
+        <option value="all">All Locations</option>
+        <option value="main-building">Main Building</option>
+        <option value="library">Library</option>
+        <option value="lab-block">Lab Block</option>
+      </select>
+    </div>
+
+    <div id="locationGallery" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+  </div>
+
+  <div id="viewerModal" class="viewer-modal">
+    <div class="viewer-controls">
+      <button onclick="closeViewer()" class="btn-primary">Close</button>
+    </div>
+
+    <div id="panorama"></div>
+    
+
+    <div class="viewer-info">
+      <h3 id="viewerTitle" class="text-2xl font-bold"></h3>
+      <p id="viewerLocation" class="opacity-80"></p>
+    </div>
+  </div>
+
+  <script>
+    let images360 = [];
+    let currentFilter = "all";
+    let pano = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      images360 = [
+        {
+          id: 1,
+          location: "Campus Observatory",
+          locationId: "main-building",
+          title: "Campus 360° View",
+          imageData: "obv.jpg"
+        },
+        {
+          id: 2,
+          location: "Main Library",
+          locationId: "library",
+          title: "Library 360° Interior",
+          imageData: "lib.jpg"
+        },
+        {
+          id: 3,
+          location: "Computer Lab",
+          locationId: "lab-block",
+          title: "Computer Lab View",
+          imageData: "tstv.jpg"
+        }
+      ];
+
+      updateLocationGallery();
+    });
+
+    function filterLocations() {
+      currentFilter = document.getElementById("filterLocation").value;
+      updateLocationGallery();
+    }
+
+    function updateLocationGallery() {
+      const gallery = document.getElementById("locationGallery");
+      const count = document.getElementById("locationCount");
+
+      const filtered = currentFilter === "all"
+        ? images360
+        : images360.filter(x => x.locationId === currentFilter);
+
+      count.textContent = filtered.length + " Locations";
+
+      gallery.innerHTML = filtered.map(img => `
+        <div class="card location-grid-item cursor-pointer" onclick="openViewer(${img.id})">
+          <img src="${img.imageData}">
+          <div class="p-4">
+            <h3 class="font-bold text-lg" style="color: var(--royal-blue);">${img.title}</h3>
+            <p class="text-sm" style="color: var(--gold);">${img.location}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function openViewer(id) {
+      const img = images360.find(i => i.id === id);
+      if (!img) return;
+
+      document.getElementById("viewerTitle").textContent = img.title;
+      document.getElementById("viewerLocation").textContent = img.location;
+
+      document.getElementById("viewerModal").classList.add("active");
+      document.body.style.overflow = "hidden";
+
+      if (pano) pano.destroy();
+
+      pano = pannellum.viewer("panorama", {
+        type: "equirectangular",
+        panorama: img.imageData,
+        autoLoad: true,
+        showZoomCtrl: true,
+        showFullscreenCtrl: true
+      });
+    }
+
+    function closeViewer() {
+      document.getElementById("viewerModal").classList.remove("active");
+      document.body.style.overflow = "auto";
+
+      if (pano) {
+        pano.destroy();
+        pano = null;
+      }
+    }
+  </script>
+
+</body>
+</html>

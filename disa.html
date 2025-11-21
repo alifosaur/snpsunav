@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Requester</title>
+<style>
+  :root{--navy:#001962;--gold:#C69E66;--bg:#f6f5f2}
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,Arial;margin:0;background:linear-gradient(180deg, #eccfa7);
+;color:var(--navy);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{width:100%;max-width:650px;background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.08);padding:22px}
+  header{display:flex;gap:14px;align-items:center}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--navy),#003a9e);color:#fff;display:grid;place-items:center;font-weight:800}
+  h1{margin:0;font-size:20px}
+  p.sub{margin:4px 0 18px;color:#314a63;font-size:13px}
+  label{display:block;font-weight:700;margin-top:12px;font-size:13px}
+  input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e6edf5;font-size:15px;outline:none}
+  select,input:focus,select:focus{box-shadow:0 6px 18px rgba(0,25,80,0.06);border-color:var(--navy)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .actions{display:flex;gap:10px;margin-top:14px}
+  .btn{border:0;padding:11px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+  .btn-primary{background:var(--navy);color:#fff}
+  .btn-ghost{background:transparent;border:1px solid #e6edf5}
+  .status{margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#f7f8fb,#fff8ec);border-left:6px solid var(--gold);display:none}
+  .badge{display:inline-block;padding:6px 9px;border-radius:8px;background:#eef6ff;color:var(--navy);font-weight:700}
+  .muted{color:#627388;font-size:13px;margin-top:8px}
+  .small{font-size:13px;padding:8px 10px}
+  .requests-list{margin-top:14px;display:grid;gap:8px}
+  .req{padding:10px;border-radius:10px;border:1px solid #eef3fb;background:#fff}
+  .tiny{font-size:12px;color:#6b7b8b}
+  .success{background:#e9fff0;border-left:6px solid #10b981;display:none;padding:10px;border-radius:10px;margin-top:12px}
+</style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <header>
+      <div class="logo">PU</div>
+      <div>
+        <h1 id="title">Pickup Assistant</h1>
+        <p class="sub">Quickly send your location. Nearby students will receive and can accept your request.</p>
+      </div>
+    </header>
+
+    <label for="accountId">SRN NUMBER</label>
+    <input id="accountId" placeholder="e.g. 25SUUBEXXXXXX" maxlength="40" />
+
+    <label for="block">Select Block</label>
+    <select id="block">
+      <option>A BLOCK</option><option>B BLOCK</option><option>C BLOCK</option>
+      <option>VTU BLOCK</option><option>LIBRARY</option><option>CANTEEN</option>
+    </select>
+
+    <div class="row">
+      <div>
+        <label for="floor">Floor</label>
+        <select id="floor"></select>
+      </div>
+      <div>
+        <label for="room">Room</label>
+        <select id="room"></select>
+      </div>
+    </div>
+
+    <label for="notes">Notes (optional)</label>
+    <input id="notes" placeholder="e.g. I am near the elevator / wearing a red jacket" />
+
+    <div class="actions">
+      <button id="sendBtn" class="btn btn-primary">Send Request</button>
+      <button id="cancelBtn" class="btn btn-ghost small">Cancel Request</button>
+    </div>
+
+    <div id="statusBox" class="status" role="status" aria-live="polite">
+      <div><span class="badge">No active request</span></div>
+      <div class="muted" id="statusDetails"></div>
+    </div>
+
+    <div id="acceptedBox" class="success" aria-live="polite"></div>
+
+    <!-- <div class="muted" style="margin-top:14px">Tip: Open <strong>responder.html</strong> in another tab to simulate students nearby accepting.</div> -->
+  </main>
+
+<script>
+(function(){
+  const bc = new BroadcastChannel('pickup-channel');
+  const floorEl = document.getElementById('floor');
+  const roomEl = document.getElementById('room');
+  const accountEl = document.getElementById('accountId');
+  const blockEl = document.getElementById('block');
+  const notesEl = document.getElementById('notes');
+  const sendBtn = document.getElementById('sendBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const statusBox = document.getElementById('statusBox');
+  const statusDetails = document.getElementById('statusDetails');
+  const acceptedBox = document.getElementById('acceptedBox');
+
+  // fill floors and rooms
+  for(let i=1;i<=12;i++){ const o=new Option('Floor '+i,i); floorEl.appendChild(o); }
+  const rooms = ['Classroom 1','Classroom 2','Classroom 3','Classroom 4','Lab 1','Lab 2','Staff Room 1','Staff Room 2','Cabin 1','Cabin 2'];
+  rooms.forEach(r=>roomEl.add(new Option(r)));
+
+  // storage helpers
+  const STORAGE_KEY = 'accessible_requests_v1';
+  function readAll(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return[]} }
+  function writeAll(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+  // find this user's active request (by accountId)
+  function findActiveById(id){
+    return readAll().find(r=>r.accountId===id && r.status!=='cancelled' && r.status!=='completed');
+  }
+
+  function showStatusFor(req){
+    if(!req){ statusBox.style.display='block'; statusDetails.textContent = 'No active request.'; acceptedBox.style.display='none'; return; }
+    statusBox.style.display='block';
+    statusDetails.innerHTML = `Request: <strong>${req.block}, Floor ${req.floor}, ${req.room}</strong><br>Sent: ${new Date(req.createdAt).toLocaleString()}<br>Status: <strong>${req.status}</strong>`;
+    if(req.status==='accepted'){
+      acceptedBox.style.display='block';
+      acceptedBox.innerHTML = `✅ <strong>${req.acceptedName || req.acceptedBy}</strong> accepted your request.<br><span class="tiny">ETA (est): ${req.eta || '—'}</span>`;
+    } else {
+      acceptedBox.style.display='none';
+    }
+  }
+
+  // send request
+  sendBtn.addEventListener('click', ()=>{
+    const accountId = (accountEl.value||'').trim();
+    if(!accountId){ alert('Please enter Account ID'); accountEl.focus(); return; }
+    const block = blockEl.value;
+    const floor = floorEl.value;
+    const room = roomEl.value;
+    const notes = notesEl.value||'';
+    // check if already exists active
+    const existing = findActiveById(accountId);
+    if(existing && existing.status!=='cancelled' && existing.status!=='completed'){ if(!confirm('You already have an active request. Create another?')) return; }
+    const req = {
+      id: 'REQ_'+Date.now()+'_'+Math.floor(Math.random()*900),
+      accountId, block, floor, room, notes,
+      createdAt: Date.now(),
+      status: 'open',
+      acceptedBy: null,
+      acceptedName: null,
+      acceptedAt: null,
+      eta: null
+    };
+    const arr = readAll(); arr.unshift(req); writeAll(arr);
+    bc.postMessage({type:'new-request', payload:req});
+    showStatusFor(req);
+    // visual feedback
+    sendBtn.textContent = 'Sent ✓';
+    setTimeout(()=> sendBtn.textContent = 'Send Request', 1400);
+  });
+
+  // cancel request
+  cancelBtn.addEventListener('click', ()=>{
+    const accountId = (accountEl.value||'').trim();
+    if(!accountId){ alert('Enter Account ID to cancel'); return; }
+    const arr = readAll();
+    let changed=false;
+    for(let o of arr){
+      if(o.accountId===accountId && o.status==='open'){
+        o.status='cancelled'; o.cancelledAt=Date.now(); changed=true;
+      }
+    }
+    if(!changed){ alert('No open request found for this Account ID'); return; }
+    writeAll(arr);
+    bc.postMessage({type:'update-requests'});
+    showStatusFor(null);
+  });
+
+  // listen to channel updates (accept from responders)
+  bc.onmessage = e=>{
+    const {type,payload} = e.data||{};
+    if(type==='accept-request' && payload && payload.id){
+      // update local copy
+      const arr = readAll();
+      let changed=false;
+      for(let o of arr){
+        if(o.id===payload.id){
+          o.status='accepted'; o.acceptedBy=payload.acceptedBy; o.acceptedName=payload.acceptedName; o.acceptedAt=Date.now(); o.eta=payload.eta; changed=true;
+        }
+      }
+      if(changed){ writeAll(arr); }
+      // if this user is the one accepted, show
+      const me = (accountEl.value||'').trim();
+      if(me && payload.accountId===me){
+        showStatusFor(arr.find(r=>r.accountId===me));
+      }
+    } else if(type==='update-requests'){
+      // refresh UI
+      const me = (accountEl.value||'').trim();
+      if(me){
+        const r = findActiveById(me);
+        showStatusFor(r);
+      } else {
+        showStatusFor(null);
+      }
+    } else if(type==='new-request'){
+      // nothing special here for requester
+      const me = (accountEl.value||'').trim();
+      if(me && payload.accountId===me){
+        showStatusFor(payload);
+      }
+    }
+  };
+
+  // initial UI refresh: if account filled and request exists show it
+  accountEl.addEventListener('blur', ()=> {
+    const me = (accountEl.value||'').trim();
+    if(me){ const r = findActiveById(me); showStatusFor(r); } else showStatusFor(null);
+  });
+
+  // on load: show nothing
+  showStatusFor(null);
+
+  // also refresh on storage changes (other tabs that don't support BroadcastChannel)
+  window.addEventListener('storage', ()=> bc.postMessage({type:'update-requests'}) );
+
+})();
+</script>
+</body>
+</html>
