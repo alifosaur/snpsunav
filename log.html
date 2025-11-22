@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background: linear-gradient(to right,#e1bf8e); /* Bluish green gradient */
+      background: linear-gradient(to right,#e1bf8e);
     }
   </style>
 </head>
@@ -16,39 +16,60 @@
 <a
   href="home.html"
   class="fixed top-3 left-3 text-[#001962] font-semibold hover:underline py-2 px-4"
-  aria-label="back"
 >
-  &#8592; Back
+  ← Back
 </a>
-  <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
-    <h2 class="text-2xl font-bold mb-6 text-[#001962] text-center">LOGIN PAGE</h2>
-    
-    <!-- Phone Number Input -->
-    <label class="block mb-2 text-sm text-gray-700 font-semibold">PHONE NUMBER</label>
-    <input
-      type="tel"
-      placeholder="Enter your phone number"
-      class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064e3b]"
-    />
 
-    <!-- OTP Input -->
-    <label class="block mt-4 mb-2 text-sm text-gray-700 font-semibold">PASSWORD</label>
-    <input
-      type="text"
-      placeholder="Enter Password"
-      class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064e3b]"
-    />
+<div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+  <h2 class="text-2xl font-bold mb-6 text-[#001962] text-center">LOGIN PAGE</h2>
+  
+  <!-- Phone -->
+  <label class="block mb-2 text-sm text-gray-700 font-semibold">PHONE NUMBER</label>
+  <input
+    id="phone"
+    type="tel"
+    placeholder="Enter your phone number"
+    class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064e3b]"
+  />
 
-    <!-- Login Button -->
-    <button class="w-full mt-6 bg-[#001962] text-white py-3 rounded-xl hover:bg-[#001962] transition">
-      Continue
-    </button>
+  <!-- Password -->
+  <label class="block mt-4 mb-2 text-sm text-gray-700 font-semibold">PASSWORD</label>
+  <input
+    id="password"
+    type="password"
+    placeholder="Enter Password"
+    class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#064e3b]"
+  />
 
-    <!-- Don't have an account -->
-    <p class="mt-6 text-center text-sm text-gray-600">
-      Don’t have an account?
-      <a href="page.html" class="text-[#001962] font-semibold hover:underline">Create now</a>
-    </p>
-  </div>
+  <!-- Error Message -->
+  <p id="msg" class="text-red-600 text-sm mt-2"></p>
+
+  <!-- Login Button -->
+  <button 
+    onclick="login()"
+    class="w-full mt-6 bg-[#001962] text-white py-3 rounded-xl hover:bg-[#001962] transition">
+    Continue
+  </button>
+
+  <p class="mt-6 text-center text-sm text-gray-600">
+    Don’t have an account?
+    <a href="page.html" class="text-[#001962] font-semibold hover:underline">Create now</a>
+  </p>
+</div>
+
+<script>
+function login() {
+  const phone = document.getElementById('phone').value;
+  const password = document.getElementById('password').value;
+
+  // Hardcoded login check
+  if (phone === "5555555555" && password === "kasukabe") {
+    window.location.href = "index.html";   // OPEN HOME PAGE
+  } else {
+    document.getElementById('msg').innerText = "Wrong phone or password";
+  }
+}
+</script>
+
 </body>
 </html>
